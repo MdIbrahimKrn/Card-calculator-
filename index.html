@@ -228,8 +228,8 @@ function addNumbers() {
 function checkWinner() {
     for (let i = 0; i < scores.length; i++) {
         if (scores[i] >= 1000) {
-            document.getElementById('winner').innerText = `${playerNames[i]} is the winner!`;
-            disableButtons();
+            alert(`"${playerNames[i]}" is the winner!`);
+            //disableButtons();
             break;
         }
     }
@@ -253,7 +253,7 @@ function resetGame() {
         document.getElementById(`history${i}`).innerHTML = '';
         document.getElementById(`input${i}`).value = '';
         document.getElementById(`input${i}`).disabled = false;
-        document.getElementById(`player-name${i}`).innerText = `Player ${i}`;
+        //document.getElementById(`player-name${i}`).innerText = `Player ${i}`;
     }
     document.getElementById('winner').innerText = '';
 }
