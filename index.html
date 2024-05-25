@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Adding Game</title>
+    <style>
+     body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; 
+   width:100vw;
+    background-color: #f5f5f5;
+    margin: 10px;
+}
+input {width:50px;}
+.container {
+    text-align: center;
+}
+
+.input-container, .name-container {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+}
+
+.input-group, .name-group {
+    margin: 0 10px;
+    text-align: center;
+}
+
+.input-group h2, .name-group input {
+    margin-bottom: 10px;
+}
+
+.input-group input, .name-group input {
+    padding: 10px;
+    font-size: 16px;
+}
+
+.input-group input {
+    width: 60px;
+}
+
+.player-container {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px 0;
+}
+
+.player {
+    margin: 20px;
+}
+
+.player p {
+    font-size: 24px;
+    margin: 10px 0;
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+#winner {
+    margin: 20px;
+    font-size: 24px;
+    font-weight: bold;
+    color: green;
+}
+
+.reset-btn {
+    margin-top: 20px;
+    background-color: red;
+    color: white;
+    border: none;
+}
+   </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Number Adding Game</h1>
+        <div class="name-container">
+            <div class="name-group">
+                <input type="text" id="name1" placeholder="Player 1 Name">
+            </div>
+            <div class="name-group">
+                <input type="text" id="name2" placeholder="Player 2 Name">
+            </div>
+            <div class="name-group">
+                <input type="text" id="name3" placeholder="Player 3 Name">
+            </div>
+            <div class="name-group">
+                <input type="text" id="name4" placeholder="Player 4 Name">
+            </div>
+        </div>
+        <button onclick="setNames()">Set Names</button>
+        <div class="input-container">
+            <div class="input-group">
+                <h2 id="player-name1">Player 1</h2>
+                <input type="number" id="input1" placeholder="Enter a number">
+            </div>
+            <div class="input-group">
+                <h2 id="player-name2">Player 2</h2>
+                <input type="number" id="input2" placeholder="Enter a number">
+            </div>
+            <div class="input-group">
+                <h2 id="player-name3">Player 3</h2>
+                <input type="number" id="input3" placeholder="Enter a number">
+            </div>
+            <div class="input-group">
+                <h2 id="player-name4">Player 4</h2>
+                <input type="number" id="input4" placeholder="Enter a number">
+            </div>
+        </div>
+        <button onclick="addNumbers()">Add Numbers</button>
+        <div class="player-container" id="players">
+            <div class="player" id="player1">
+                <p id="score1">0</p>
+                <ul id="history1"></ul>
+            </div>
+            <div class="player" id="player2">
+                <p id="score2">0</p>
+                <ul id="history2"></ul>
+            </div>
+            <div class="player" id="player3">
+                <p id="score3">0</p>
+                <ul id="history3"></ul>
+            </div>
+            <div class="player" id="player4">
+                <p id="score4">0</p>
+                <ul id="history4"></ul>
+            </div>
+        </div>
+        <div id="winner" class="winner"></div>
+        <button onclick="resetGame()" class="reset-btn">Reset Game</button>
+    </div>
+    <script>
+let scores = [0, 0, 0, 0];
+let histories = [[], [], [], []];
+let playerNames = ["Player 1", "Player 2", "Player 3", "Player 4"];
+
+// Load scores, histories, and player names from local storage
+window.onload = function() {
+    if (localStorage.getItem('scores')) {
+        scores = JSON.parse(localStorage.getItem('scores'));
+        for (let i = 0; i < scores.length; i++) {
+            document.getElementById(`score${i + 1}`).innerText = scores[i];
+        }
+    }
+    if (localStorage.getItem('histories')) {
+        histories = JSON.parse(localStorage.getItem('histories'));
+        for (let i = 0; i < histories.length; i++) {
+            let ul = document.getElementById(`history${i + 1}`);
+            histories[i].forEach(num => {
+                let li = document.createElement('li');
+                li.innerText = num;
+                ul.appendChild(li);
+            });
+        }
+    }
+    if (localStorage.getItem('playerNames')) {
+        playerNames = JSON.parse(localStorage.getItem('playerNames'));
+        for (let i = 0; i < playerNames.length; i++) {
+            document.getElementById(`player-name${i + 1}`).innerText = playerNames[i];
+        }
+    }
+}
+
+function setNames() {
+    playerNames = [
+        document.getElementById('name1').value || "Player 1",
+        document.getElementById('name2').value || "Player 2",
+        document.getElementById('name3').value || "Player 3",
+        document.getElementById('name4').value || "Player 4"
+    ];
+
+    for (let i = 0; i < playerNames.length; i++) {
+        document.getElementById(`player-name${i + 1}`).innerText = playerNames[i];
+    }
+
+    // Save player names to local storage
+    localStorage.setItem('playerNames', JSON.stringify(playerNames));
+}
+
+function addNumbers() {
+    const inputs = [
+        parseInt(document.getElementById('input1').value),
+        parseInt(document.getElementById('input2').value),
+        parseInt(document.getElementById('input3').value),
+        parseInt(document.getElementById('input4').value)
+    ];
+
+    if (inputs.some(isNaN) || inputs.some(num => num < 0)) {
+        alert("Please enter valid positive numbers in all input boxes.");
+        return;
+    }
+
+    const total = inputs.reduce((acc, num) => acc + num, 0);
+    if (total > 360) {
+        alert("The total of the input numbers should not exceed 360.");
+        return;
+    }
+
+    for (let i = 0; i < 4; i++) {
+        scores[i] += inputs[i];
+        histories[i].push(inputs[i]);
+        document.getElementById(`score${i + 1}`).innerText = scores[i];
+        
+        let li = document.createElement('li');
+        li.innerText = inputs[i];
+        document.getElementById(`history${i + 1}`).appendChild(li);
+
+        document.getElementById(`input${i + 1}`).value = '';
+    }
+
+    // Save scores and histories to local storage
+    localStorage.setItem('scores', JSON.stringify(scores));
+    localStorage.setItem('histories', JSON.stringify(histories));
+
+    checkWinner();
+}
+
+function checkWinner() {
+    for (let i = 0; i < scores.length; i++) {
+        if (scores[i] >= 1000) {
+            document.getElementById('winner').innerText = `${playerNames[i]} is the winner!`;
+            disableButtons();
+            break;
+        }
+    }
+}
+
+function disableButtons() {
+    document.querySelector('button[onclick="addNumbers()"]').disabled = true;
+    for (let i = 1; i <= 4; i++) {
+        document.getElementById(`input${i}`).disabled = true;
+    }
+}
+
+function resetGame() {
+    scores = [0, 0, 0, 0];
+    histories = [[], [], [], []];
+    localStorage.removeItem('scores');
+    localStorage.removeItem('histories');
+    localStorage.removeItem('playerNames');
+    for (let i = 1; i <= 4; i++) {
+        document.getElementById(`score${i}`).innerText = 0;
+        document.getElementById(`history${i}`).innerHTML = '';
+        document.getElementById(`input${i}`).value = '';
+        document.getElementById(`input${i}`).disabled = false;
+        document.getElementById(`player-name${i}`).innerText = `Player ${i}`;
+    }
+    document.getElementById('winner').innerText = '';
+}
+</script>
+</body>
+</html>
